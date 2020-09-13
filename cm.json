@@ -1,0 +1,284 @@
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+      ],
+      "filter": [
+        {
+          "term": {
+            "measurement_name": "docsisCmtsCm"
+          }
+        },
+        {
+          "exists": {
+            "field": "tag.Nodo"
+          }
+        },
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "%{_from}",
+              "lte": "%{_to}",
+              "format": "epoch_second"
+            }
+          }
+        }
+      ],
+      "should": [],
+      "must_not": [
+        {
+          "exists": {
+            "field": "tag.CmError"
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "group_by": {
+      "composite": {
+        "size": 5000,
+        "sources": [
+          {
+            "agr.cmts": {
+              "terms": {
+                "field": "tag.cmts"
+              }
+            }
+          },
+          {
+            "agr.nodo": {
+              "terms": {
+                "field": "tag.Nodo"
+              }
+            }
+          },
+          {
+            "host.mac": {
+              "terms": {
+                "field": "tag.CmtsCmMac"
+              }
+            }
+          },
+          {
+            "host.Model": {
+              "terms": {
+                "field": "tag.sysDescr.Model"
+              }
+            }
+          },
+          {
+            "host.Vendor": {
+              "terms": {
+                "field": "tag.sysDescr.Vendor"
+              }
+            }
+          }
+        ]
+      },
+      "aggs": {
+        "eval.wifi.ok": {
+          "filter": {
+            "range": {
+              "tag.Wifi": {
+                "gte": 1,
+                "lte": 6
+              }
+            }
+          }
+        },
+        "eval.wifi.error": {
+          "filter": {
+            "range": {
+              "tag.Wifi": {
+                "gte": 7,
+                "lte": 10
+              }
+            }
+          }
+        },
+        "eval.saturacion.down": {
+          "filter": {
+            "range": {
+              "tag.saturacion": {
+                "gt": 0.5,
+                "lt": 1.5
+              }
+            }
+          }
+        },
+        "eval.Tx": {
+          "filter": {
+            "range": {
+              "tag.TxCM": {
+                "gt": 2.5,
+                "lt": 3.5
+              }
+            }
+          }
+        },
+        "eval.Rx": {
+          "filter": {
+            "range": {
+              "tag.RxCM": {
+                "gt": 2.5,
+                "lt": 3.5
+              }
+            }
+          }
+        },
+        "eval.Resets": {
+          "filter": {
+            "range": {
+              "tag.Resets": {
+                "gt": 2.5,
+                "lt": 3.5
+              }
+            }
+          }
+        },
+        "eval.Errors": {
+          "filter": {
+            "range": {
+              "tag.cw_error": {
+                "gt": 2.5,
+                "lt": 3.5
+              }
+            }
+          }
+        },
+        "metric.wifi": {
+          "avg": {
+            "field": "tag.Wifi"
+          }
+        },
+        "metric.bps.in": {
+          "percentiles": {
+            "field": "field.in_bps",
+            "percents": [
+              95
+            ]
+          }
+        },
+        "metric.bps.out": {
+          "percentiles": {
+            "field": "field.out_bps",
+            "percents": [
+              95
+            ]
+          }
+        },
+        "metric.bytes.out": {
+          "sum": {
+            "field": "field.out_bytes"
+          }
+        },
+        "metric.bytes.in": {
+          "sum": {
+            "field": "field.in_bytes"
+          }
+        },
+        "metric.rssi": {
+          "extended_stats": {
+            "field": "field.WifiRSSI",
+            "sigma": 2
+          }
+        },
+        "metric.tx": {
+          "extended_stats": {
+            "field": "field.CmStatusTxPower",
+            "sigma": 2,
+            "script": {
+              "source": "_value / 10"
+            }
+          }
+        },
+        "metric.rx": {
+          "extended_stats": {
+            "field": "field.DownChannelPower",
+            "sigma": 2,
+            "script": {
+              "source": "_value / 10"
+            }
+          }
+        },
+        "metric.snr.up": {
+          "avg": {
+            "field": "field.CmtsCmUpSnr",
+            "script": {
+              "source": "_value / 10"
+            }
+          }
+        },
+        "metric.snr.down": {
+          "avg": {
+            "field": "field.SigQSignalNoise",
+            "script": {
+              "source": "_value / 10"
+            }
+          }
+        },
+        "info.bw.down": {
+          "max": {
+            "field": "tag.fichaT.bw_down"
+          }
+        },
+        "calc.wifi.error": {
+          "bucket_script": {
+            "buckets_path": {
+              "ok": "eval.wifi.ok._count",
+              "er": "eval.wifi.error._count"
+            },
+            "script": "params.er / (params.ok + params.er)"
+          }
+        },
+        "calc.tx.error": {
+          "bucket_script": {
+            "buckets_path": {
+              "er": "eval.Tx._count",
+              "to": "_count"
+            },
+            "script": "params.er / params.to"
+          }
+        },
+        "calc.rx.error": {
+          "bucket_script": {
+            "buckets_path": {
+              "er": "eval.Rx._count",
+              "to": "_count"
+            },
+            "script": "params.er / params.to"
+          }
+        },
+        "calc.resets.error": {
+          "bucket_script": {
+            "buckets_path": {
+              "er": "eval.Resets._count",
+              "to": "_count"
+            },
+            "script": "params.er / params.to"
+          }
+        },
+        "calc.codewords.error": {
+          "bucket_script": {
+            "buckets_path": {
+              "er": "eval.Errors._count",
+              "to": "_count"
+            },
+            "script": "params.er / params.to"
+          }
+        },
+        "calc.saturacion.down": {
+          "bucket_script": {
+            "buckets_path": {
+              "er": "eval.saturacion.down._count",
+              "to": "_count"
+            },
+            "script": "params.er / params.to"
+          }
+        }
+      }
+    }
+  }
+}

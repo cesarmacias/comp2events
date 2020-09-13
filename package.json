@@ -1,0 +1,17 @@
+{
+  "name": "els_comp2events",
+  "version": "1.0.0",
+  "description": "",
+  "main": "aggs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "CESAR MACIAS",
+  "license": "GNU",
+  "dependencies": {
+    "es7": "npm:@elastic/elasticsearch@^7.9.0",
+    "fs": "0.0.1-security",
+    "minimist": "^1.2.5"
+  }
+}
