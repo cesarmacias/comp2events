@@ -6,7 +6,8 @@ Elasticsearch Aggregation composite transform to event format (simple JSON line)
 * Only one aggregation level for composite is suppoterd
 * All aggs for response have to be part of one sub-aggs
 * The program is for roll-up time series data to aggregation per day
-* The file cm-json is a example of DSL query
+* The file cm.json is a example of DSL query
+* The file config-test.json es a example of configuration file
 
 # Run
 node aggs.js --config=config.json
