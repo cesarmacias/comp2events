@@ -1,0 +1,66 @@
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [],
+      "filter": [
+        {
+          "term": {
+            "measurement_name": "olt_HW_ont"
+          }
+        },
+        {
+          "term": {
+            "tag.model": "5800"
+          }
+        },
+        {
+          "exists": {
+            "field": "tag.cluster"
+          }
+        },
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "%{_from}",
+              "lte": "%{_to}",
+              "format": "epoch_second"
+            }
+          }
+        }
+      ],
+      "should": [],
+      "must_not": []
+    }
+  },
+  "aggs": {
+    "group_by": {
+      "composite": {
+        "size": 5000,
+        "sources": [
+          {
+            "agr.olt": {
+              "terms": {
+                "field": "tag.hostname"
+              }
+            }
+          },
+          {
+            "agr.cluster": {
+              "terms": {
+                "field": "tag.cluster"
+              }
+            }
+          }
+        ]
+      },
+      "aggs": {
+        "metric.ont.count": {
+          "cardinality": {
+            "field": "tag.OntSerial"
+          }
+        }
+      }
+    }
+  }
+}
