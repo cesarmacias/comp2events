@@ -119,8 +119,8 @@ async function main(confFile) {
                 requestTimeout: 90000
             });
             let delay = "delay" in config && config.delay > 0 ? config.delay * 60 : 0;
-            let timeTo = Date.now() / 1000 - delay;
-            let timeFrom = timeTo - config.interval * 60;
+            let timeTo = Math.round(Date.now() / 1000 - delay);
+            let timeFrom = Math.round(timeTo - config.interval * 60);
             if (fs.existsSync(config.query_file)) {
                 const strDsl = fs.readFileSync(config.query_file, 'utf8');
                 await run(config, timeFrom, timeTo, client, strDsl);
