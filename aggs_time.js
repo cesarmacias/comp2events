@@ -24,7 +24,6 @@ const argv = require('minimist')(process.argv.slice(2));
         currentObj[keys[i]] = val;
         delete obj[str];
     }
-
     Object.expand = function (obj) {
         for (const key in obj) {
             if (key.indexOf(".") !== -1) {
@@ -33,13 +32,11 @@ const argv = require('minimist')(process.argv.slice(2));
         }
         return obj;
     };
-
 })();
 
 const isObject = function (a) {
     return (!!a) && (a.constructor === Object);
 };
-
 /*
     FUNCTION MAKE THE SEARCH QUERY AGGREGATION AND INSERT OR PRINT THE RESPONSE IN EVENT FORMAT
  */
@@ -104,7 +101,6 @@ async function run(config, timeFrom, timeTo, esClient, strDsl) {
             console.error(e);
     }
 }
-
 /*
     FUNCTION TO RED CONFIG FILE - PREPARE THE LOOP FOR SEARCH
  */
@@ -140,7 +136,6 @@ async function main(confFile) {
         process.exit(0);
     }
 }
-
 /*
  STAR PROGRAM
  */
