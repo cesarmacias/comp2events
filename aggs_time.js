@@ -64,7 +64,6 @@ async function run(config, timeFrom, timeTo, esClient, strDsl) {
                 } else {
                     flag = false;
                 }
-                let bulkBody = [];
                 for await (const item of array) {
                     if (isObject(item)) {
                         let resp = {};
