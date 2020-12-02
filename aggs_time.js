@@ -104,7 +104,7 @@ async function run(config, timeFrom, timeTo, esClient, strDsl) {
 /*
     FUNCTION TO RED CONFIG FILE - PREPARE THE LOOP FOR SEARCH
  */
-async function main(confFile) {
+async function main(confFile, opt_delay) {
     try {
         if (fs.existsSync(confFile)) {
             const strConf = fs.readFileSync(confFile, 'utf8');
@@ -118,7 +118,12 @@ async function main(confFile) {
                 maxRetries: 5,
                 requestTimeout: 90000
             });
-            let delay = "delay" in config && config.delay > 0 ? config.delay * 60 : 0;
+            let delay = 0;
+            if (opt_delay && opt_delay > 0) {
+                delay = opt_delay * 60;
+            } else if ("delay" in config && config.delay > 0) {
+                delay = config.delay * 60;
+            }
             let timeTo = Math.round(Date.now() / 1000 - delay);
             let timeFrom = Math.round(timeTo - config.interval * 60);
             if (fs.existsSync(config.query_file)) {
@@ -140,7 +145,7 @@ async function main(confFile) {
  STAR PROGRAM
  */
 if ("config" in argv) {
-    main(argv.config).catch(e => {
+    main(argv.config, argv.delay).catch(e => {
         console.error(e);
     });
 } else {
