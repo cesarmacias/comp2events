@@ -79,11 +79,12 @@ async function run(config, timeFrom, timeTo, esClient, strDsl) {
                                 if (item[key]["buckets"][0]["doc_count"])
                                     resp[key] = item[key]["buckets"][0]["doc_count"];
                             } else if ("values" in item[key]) {
-                                if (isObject(item[key].values)) {
+                                /*if (isObject(item[key].values)) {
                                     resp[key] = Object.expand(item[key].values);
                                 } else {
                                     resp[key] = item[key].values;
-                                }
+                                }*/
+                                resp[key] = item[key].values;
                             } else if ("doc_count" in item[key]) {
                                 resp[key] = item[key]["doc_count"];
                             } else {
